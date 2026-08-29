@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-const rawBase = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '');
-const apiBase = rawBase
-  ? (rawBase.endsWith('/api') ? rawBase : `${rawBase}/api`)
-  : '/api';
+const LIVE_BACKEND_URL = 'https://thesis-project-backend-mxhp.onrender.com';
+const rawBase = (import.meta.env.VITE_API_BASE_URL || LIVE_BACKEND_URL).trim().replace(/\/$/, '');
+const apiBase = rawBase.endsWith('/api') ? rawBase : `${rawBase}/api`;
 
 if (typeof window !== 'undefined') {
   console.log(`[API Config] Active API Base URL: ${apiBase}`);

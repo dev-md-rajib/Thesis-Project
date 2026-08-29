@@ -24,7 +24,7 @@ export default function InterviewRoom() {
   useEffect(() => {
     if (!interview) { navigate('/candidate/interview'); return; }
 
-    const socketUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    const socketUrl = import.meta.env.VITE_API_BASE_URL || 'https://thesis-project-backend-mxhp.onrender.com';
     const socket = io(socketUrl, {
       auth: { token: localStorage.getItem('token') },
       transports: ['websocket', 'polling'],

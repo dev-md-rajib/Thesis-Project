@@ -27,10 +27,7 @@ const LANGUAGES = [
 
 const getSocketUrl = () => {
   if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-  if (typeof window !== 'undefined' && window.location.hostname) {
-    return `${window.location.protocol}//${window.location.hostname}:5000`;
-  }
-  return 'http://localhost:5000';
+  return 'https://thesis-project-backend-mxhp.onrender.com';
 };
 
 export default function LiveWebRTCInterviewRoom({ interview, user, onLeave }) {

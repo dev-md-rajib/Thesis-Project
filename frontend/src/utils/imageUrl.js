@@ -13,7 +13,8 @@ export function getImageUrl(path) {
   ) {
     return path;
   }
-  const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+  const LIVE_BACKEND_URL = 'https://thesis-project-backend-mxhp.onrender.com';
+  const baseUrl = (import.meta.env.VITE_API_BASE_URL || LIVE_BACKEND_URL).replace(/\/$/, '');
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   return baseUrl ? `${baseUrl}${cleanPath}` : cleanPath;
 }
