@@ -31,10 +31,12 @@ const practiceRoutes = require('./src/routes/practice');
 const multiplayerRoutes = require('./src/routes/multiplayer');
 const trackerRoutes = require('./src/routes/tracker');
 
-// Connect DB and start notification scheduler
+// Connect DB, seed demo data, and start notification scheduler
 const { startNotificationScheduler } = require('./src/services/notificationService');
+const autoSeed = require('./src/utils/autoSeed');
 (async () => {
   await connectDB();
+  await autoSeed();
   startNotificationScheduler();
 })();
 
