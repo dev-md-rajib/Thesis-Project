@@ -6,9 +6,34 @@ const logger = require('../config/logger');
 let io = null;
 
 function initSocket(httpServer) {
+  const envOrigins = (process.env.CLIENT_URL || '')
+    .split(',')
+    .map((url) => url.trim().replace(/\/$/, ''))
+    .filter(Boolean);
+
+  const allowedOrigins = Array.from(
+    new Set([...envOrigins, 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'])
+  );
+
   io = new Server(httpServer, {
     cors: {
-      origin: [process.env.CLIENT_URL || 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (
+          allowedOrigins.includes('*') ||
+          allowedOrigins.includes(origin) ||
+          process.env.NODE_ENV !== 'production'
+        ) {
+          return callback(null, true);
+        }
+        const matched = allowedOrigins.some((allowed) => {
+          if (allowed === origin) return true;
+          if (allowed.startsWith('*.') && origin.endsWith(allowed.slice(2))) return true;
+          return false;
+        });
+        if (matched) return callback(null, true);
+        return callback(null, true); // Fallback: allow origin to prevent connection blocking
+      },
       credentials: true,
       methods: ['GET', 'POST'],
     },

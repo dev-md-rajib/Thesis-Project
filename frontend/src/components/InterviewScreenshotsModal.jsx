@@ -11,15 +11,7 @@ import {
 } from 'react-icons/hi';
 import toast from 'react-hot-toast';
 import api from '../services/api';
-
-const getImageUrl = (url) => {
-  if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-    return url;
-  }
-  const cleanPath = url.startsWith('/') ? url : `/${url}`;
-  return cleanPath;
-};
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function InterviewScreenshotsModal({ interview, onClose }) {
   const [loading, setLoading] = useState(true);

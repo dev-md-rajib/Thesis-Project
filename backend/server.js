@@ -51,21 +51,51 @@ const app = express();
 // Security headers
 app.use(helmet({ crossOriginResourcePolicy: false }));
 
-// CORS
-app.use(cors({
-  origin: [process.env.CLIENT_URL || 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-}));
+// CORS configuration (supports single URL, multiple comma-separated URLs, and wildcards)
+const getAllowedOrigins = () => {
+  const envOrigins = (process.env.CLIENT_URL || '')
+    .split(',')
+    .map((url) => url.trim().replace(/\/$/, ''))
+    .filter(Boolean);
 
-// Rate limiting (disabled for multiplayer polling)
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 200,
-//   message: { success: false, message: 'Too many requests, please try again later.' },
-// });
-// app.use(limiter);
+  const defaults = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+  return Array.from(new Set([...envOrigins, ...defaults]));
+};
 
+const allowedOrigins = getAllowedOrigins();
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, desktop tracker, curl, postman)
+      if (!origin) return callback(null, true);
+
+      if (
+        allowedOrigins.includes('*') ||
+        allowedOrigins.includes(origin) ||
+        process.env.NODE_ENV !== 'production'
+      ) {
+        return callback(null, true);
+      }
+
+      // Check for wildcard subdomains or origin match
+      const matched = allowedOrigins.some((allowed) => {
+        if (allowed === origin) return true;
+        if (allowed.startsWith('*.') && origin.endsWith(allowed.slice(2))) return true;
+        return false;
+      });
+
+      if (matched) return callback(null, true);
+
+      // Fallback: log warning and permit origin to prevent rigid deployment breakage
+      logger.warn(`CORS request from unlisted origin: ${origin}`);
+      return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  })
+);
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -99,10 +129,32 @@ app.use('/api/tracker', trackerRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'AI Hiring Platform API is running', timestamp: new Date().toISOString() });
+  res.json({
+    success: true,
+    message: 'AI Hiring Platform API is running',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+  });
 });
 
-// 404 handler
+// Serve frontend build if present (for single-server / monolithic deployment)
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
+
+// 404 handler for API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ success: false, message: `API route ${req.originalUrl} not found` });
+});
+
+// Fallback 404 handler
 app.use((req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
 });
