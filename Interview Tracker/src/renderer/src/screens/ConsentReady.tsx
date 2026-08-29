@@ -86,7 +86,7 @@ export const ConsentReady: React.FC<ConsentReadyProps> = ({
 
   const handleOpenPrivacyPolicy = () => {
     if (window.electronAPI) {
-      window.electronAPI.openExternal('http://localhost:5000/privacy-policy');
+      window.electronAPI.openExternal('https://final-year-aih.vercel.app/privacy-policy');
     }
   };
 
@@ -97,7 +97,9 @@ export const ConsentReady: React.FC<ConsentReadyProps> = ({
     if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('data:')) {
       return img;
     }
-    const apiBase = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) || 'http://localhost:5000';
+    const apiBase =
+      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
+      'https://thesis-project-backend-mxhp.onrender.com';
     return `${apiBase.replace(/\/$/, '')}${img.startsWith('/') ? img : `/${img}`}`;
   };
 

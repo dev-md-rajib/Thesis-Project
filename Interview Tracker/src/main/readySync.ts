@@ -4,7 +4,10 @@ import { TrackerStatus } from '../shared/types';
 import { apiClient } from '../shared/apiClient';
 import { screenshotCaptureManager } from './screenshotCapture';
 
-const SOCKET_SERVER_URL = process.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_SERVER_URL =
+  process.env.VITE_SOCKET_URL ||
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SOCKET_URL) ||
+  'https://thesis-project-backend-mxhp.onrender.com';
 
 export class ReadySyncManager extends EventEmitter {
   private status: TrackerStatus = 'idle';

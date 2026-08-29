@@ -11,7 +11,7 @@ interface SettingsProps {
 export const Settings: React.FC<SettingsProps> = ({ user, onClose, onLogout }) => {
   const handleOpenPrivacyPolicy = () => {
     if (window.electronAPI) {
-      window.electronAPI.openExternal('http://localhost:5000/privacy-policy');
+      window.electronAPI.openExternal('https://final-year-aih.vercel.app/privacy-policy');
     }
   };
 

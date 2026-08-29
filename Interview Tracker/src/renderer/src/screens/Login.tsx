@@ -60,14 +60,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const handleOpenSignup = (e: React.MouseEvent) => {
     e.preventDefault();
     if (window.electronAPI) {
-      window.electronAPI.openExternal('http://localhost:5000/signup');
+      window.electronAPI.openExternal('https://final-year-aih.vercel.app/register');
     }
   };
 
   const handleOpenForgotPassword = (e: React.MouseEvent) => {
     e.preventDefault();
     if (window.electronAPI) {
-      window.electronAPI.openExternal('http://localhost:5000/forgot-password');
+      window.electronAPI.openExternal('https://final-year-aih.vercel.app/forgot-password');
     }
   };
 

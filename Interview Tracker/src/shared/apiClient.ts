@@ -9,8 +9,10 @@ import {
   ActivityLogPayload
 } from './types';
 
-// Default backend API URL - can be overridden by environment variables
-const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL =
+  process.env.VITE_API_BASE_URL ||
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL) ||
+  'https://thesis-project-backend-mxhp.onrender.com';
 
 class ApiClient {
   private client: AxiosInstance;
