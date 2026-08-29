@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+  const secret = process.env.JWT_SECRET || 'ai_hiring_platform_super_secret_jwt_key_2025';
+  return jwt.sign({ id, role }, secret, {
     expiresIn: process.env.JWT_EXPIRE || '7d',
   });
 };

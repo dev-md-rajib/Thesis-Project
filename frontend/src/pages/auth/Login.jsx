@@ -15,17 +15,25 @@ export default function Login() {
   const [bannedUser, setBannedUser] = useState(null);
   const [appealText, setAppealText] = useState('');
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+
+  const handleFillDemo = (email, password = 'password123') => {
+    setValue('email', email, { shouldValidate: true });
+    setValue('password', password, { shouldValidate: true });
+    toast.success(`Loaded credentials for ${email}`);
+  };
 
   const onSubmit = async (formData) => {
     setLoading(true);
     try {
+      console.log('[Login Attempt]', formData.email);
       const { data } = await api.post('/auth/login', formData);
       login(data.user, data.token);
       toast.success(`Welcome back, ${data.user.name}!`);
       const redirectMap = { ADMIN: '/admin', RECRUITER: '/recruiter', CANDIDATE: '/candidate', INTERVIEWER: '/interviewer' };
       navigate(redirectMap[data.user.role] || '/candidate');
     } catch (err) {
+      console.error('[Login Error Response]', err.response?.data || err.message);
       if (err.response?.status === 403 && err.response?.data?.isBanned) {
         setBannedUser({
           email: formData.email,
@@ -34,7 +42,7 @@ export default function Login() {
         });
         return;
       }
-      toast.error(err.response?.data?.message || 'Login failed');
+      toast.error(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -207,25 +215,41 @@ export default function Login() {
                   </span>
                 </div>
                 <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2.5">
-                  The provided accounts and metrics are for demonstration purposes. All demo passwords are: <code className="font-mono font-bold text-primary-600 dark:text-primary-400">password123</code>
+                  Click any account below to auto-fill (password: <code className="font-mono font-bold text-primary-600 dark:text-primary-400">password123</code>):
                 </p>
                 <div className="space-y-1.5 text-xs text-gray-500 dark:text-gray-400">
-                  <p className="flex justify-between items-center bg-dark-900/40 px-2 py-1 rounded">
-                    <span>Admin:</span>
-                    <span className="text-gray-900 dark:text-gray-300 font-mono font-medium">admin@aiplatform.com</span>
-                  </p>
-                  <p className="flex justify-between items-center bg-dark-900/40 px-2 py-1 rounded">
-                    <span>Candidate:</span>
-                    <span className="text-gray-900 dark:text-gray-300 font-mono font-medium">candidate_test@example.com</span>
-                  </p>
-                  <p className="flex justify-between items-center bg-dark-900/40 px-2 py-1 rounded">
-                    <span>Recruiter:</span>
-                    <span className="text-gray-900 dark:text-gray-300 font-mono font-medium">recruiter@aiplatform.com</span>
-                  </p>
-                  <p className="flex justify-between items-center bg-dark-900/40 px-2 py-1 rounded">
-                    <span>Interviewer:</span>
-                    <span className="text-gray-900 dark:text-gray-300 font-mono font-medium">interviewer@aiplatform.com</span>
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleFillDemo('admin@aiplatform.com', 'password123')}
+                    className="w-full flex justify-between items-center bg-dark-900/60 hover:bg-primary-950/40 hover:border-primary-500/40 border border-dark-border px-2.5 py-1.5 rounded text-left transition-colors"
+                  >
+                    <span className="font-semibold text-gray-400">Admin:</span>
+                    <span className="text-primary-400 font-mono font-medium">admin@aiplatform.com</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleFillDemo('candidate_test@example.com', 'password123')}
+                    className="w-full flex justify-between items-center bg-dark-900/60 hover:bg-primary-950/40 hover:border-primary-500/40 border border-dark-border px-2.5 py-1.5 rounded text-left transition-colors"
+                  >
+                    <span className="font-semibold text-gray-400">Candidate:</span>
+                    <span className="text-primary-400 font-mono font-medium">candidate_test@example.com</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleFillDemo('recruiter@aiplatform.com', 'password123')}
+                    className="w-full flex justify-between items-center bg-dark-900/60 hover:bg-primary-950/40 hover:border-primary-500/40 border border-dark-border px-2.5 py-1.5 rounded text-left transition-colors"
+                  >
+                    <span className="font-semibold text-gray-400">Recruiter:</span>
+                    <span className="text-primary-400 font-mono font-medium">recruiter@aiplatform.com</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleFillDemo('interviewer@aiplatform.com', 'password123')}
+                    className="w-full flex justify-between items-center bg-dark-900/60 hover:bg-primary-950/40 hover:border-primary-500/40 border border-dark-border px-2.5 py-1.5 rounded text-left transition-colors"
+                  >
+                    <span className="font-semibold text-gray-400">Interviewer:</span>
+                    <span className="text-primary-400 font-mono font-medium">interviewer@aiplatform.com</span>
+                  </button>
                 </div>
               </div>
             </>

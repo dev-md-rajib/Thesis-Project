@@ -21,14 +21,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 globally
+// Handle 401 globally (only for authenticated routes, not login/register)
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const reqUrl = err.config?.url || '';
+    const isAuthRoute = reqUrl.includes('/auth/login') || reqUrl.includes('/auth/register') || reqUrl.includes('/auth/appeal');
+
+    if (err.response?.status === 401 && !isAuthRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(err);
   }

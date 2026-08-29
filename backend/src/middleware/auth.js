@@ -12,7 +12,8 @@ const protect = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ success: false, message: 'Not authorized, no token' });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'ai_hiring_platform_super_secret_jwt_key_2025';
+    const decoded = jwt.verify(token, secret);
     req.user = await User.findById(decoded.id).select('-password');
     if (!req.user) {
       return res.status(401).json({ success: false, message: 'User not found' });
@@ -45,7 +46,8 @@ const optionalAuth = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
     }
     if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const secret = process.env.JWT_SECRET || 'ai_hiring_platform_super_secret_jwt_key_2025';
+      const decoded = jwt.verify(token, secret);
       req.user = await User.findById(decoded.id).select('-password');
     }
     next();
